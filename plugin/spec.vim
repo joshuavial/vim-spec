@@ -31,11 +31,25 @@ function! s:SetCoffeescriptCommand()
   endif
 endfunction
 
+" Set Generic NPM test
+" to use add a "vim-spec": "whatever-test-command-you-like $TEST" into your
+" package.json scripts definition
+function! s:SetNpmTestCommand()
+  if !exists("g:npm_test_command")
+    let s:cmd = "$TEST={script} npm run vim-spec"
+    call s:GUIRunning()
+  else
+    let g:spec_command = g:npm_test_command
+  endif
+endfunction
+
 " Initial Spec Command
 function! s:SetInitialSpecCommand()
   let l:spec = s:plugin_path . "/bin/major_filetype"
   let l:filetype = system(l:spec)
-  if l:filetype =~ 'rb'
+  if filereadable("./package.json")
+    call s:SetNpmTestCommand()
+  elseif l:filetype =~ 'rb'
     call s:SetRubyCommand()
   elseif l:filetype =~ 'js'
     call s:SetJavascriptCommand()
@@ -48,8 +62,10 @@ endfunction
 
 " Determine which command based on filetype
 function! s:GetCorrectCommand()
+  if filereadable("./package.json")
+    call s:SetNpmTestCommand()
   " Set default {rspec} command (ruby/rails)
-  if &filetype ==? 'ruby'
+  elseif &filetype ==? 'ruby'
     call s:SetRubyCommand()
   " Set default {mocha} command (javascript)
   elseif &filetype ==? 'javascript'

@@ -31,6 +31,16 @@ function! s:SetCoffeescriptCommand()
   endif
 endfunction
 
+" Set Cucumber
+function! s:SetCucumberCommand()
+  if !exists("g:cucumber_command")
+    let s:cmd = "cucumber {spec}"
+    call s:GUIRunning()
+  else
+    let g:spec_command = g:cucumber_command
+  endif
+endfunction
+
 " Set Generic NPM test
 " to use add a "vim-spec": "whatever-test-command-you-like $TEST" into your
 " package.json scripts definition
@@ -73,6 +83,9 @@ function! s:GetCorrectCommand()
   " Set default {mocha} command (coffeescript)
   elseif &filetype ==? 'coffee'
     call s:SetCoffeescriptCommand()
+  " Set default {cucumber} command (feature)
+  elseif &filetype ==? 'cucumber'
+    call s:SetCucumberCommand()
   " Fallthrough default
   else
     call s:SetInitialSpecCommand()

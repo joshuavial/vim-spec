@@ -57,14 +57,14 @@ endfunction
 function! s:SetInitialSpecCommand()
   let l:spec = s:plugin_path . "/bin/major_filetype"
   let l:filetype = system(l:spec)
-  if filereadable("./package.json")
-    call s:SetNpmTestCommand()
-  elseif l:filetype =~ 'rb'
+  if l:filetype =~ 'rb'
     call s:SetRubyCommand()
   elseif l:filetype =~ 'js'
     call s:SetJavascriptCommand()
   elseif l:filetype =~ 'coffee'
     call s:SetCoffeescriptCommand()
+  elseif filereadable("./package.json")
+    call s:SetNpmTestCommand()
   else
     let g:spec_command = ""
   endif
@@ -72,10 +72,8 @@ endfunction
 
 " Determine which command based on filetype
 function! s:GetCorrectCommand()
-  if filereadable("./package.json")
-    call s:SetNpmTestCommand()
   " Set default {rspec} command (ruby/rails)
-  elseif &filetype ==? 'ruby'
+  if &filetype ==? 'ruby'
     call s:SetRubyCommand()
   " Set default {mocha} command (javascript)
   elseif &filetype ==? 'javascript'
@@ -86,6 +84,8 @@ function! s:GetCorrectCommand()
   " Set default {cucumber} command (feature)
   elseif &filetype ==? 'cucumber'
     call s:SetCucumberCommand()
+  elseif filereadable("./package.json")
+    call s:SetNpmTestCommand()
   " Fallthrough default
   else
     call s:SetInitialSpecCommand()
